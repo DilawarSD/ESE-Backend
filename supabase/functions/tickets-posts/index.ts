@@ -3,22 +3,48 @@
 // This enables autocomplete, go to definition, etc.
 
 // Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts"
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { serve } from "https://deno.land/std@0.181.0/http/server.ts";
 
-console.log("Hello from Functions!")
-const supabase = createClient(Deno.env.get(PROJECT_URL),Deno.env.get(ANON_KEY))
-Deno.serve(async (req) => {
-  
-let { data: Name, error } = await supabase
-.from('Name')
-.select('*')
-        
+console.log("Hello from Functions!");
+
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+);
+// Handle HTTP requests
+serve(async () => {
+  // Insert a record into the 'Name' table
+  const { data: insertData, error: insertError } = await supabase
+    .from("Name")
+    .insert([{ column_name: "someValue", column_tasks: "otherValue" }])
+    .select();
+
+  if (insertError) {
+    return new Response(JSON.stringify({ error: insertError.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  // Fetch data from the 'Name' table
+  const { data: fetchData, error: fetchError } = await supabase
+    .from("Name")
+    .select("*");
+
+  if (fetchError) {
+    return new Response(JSON.stringify({ error: fetchError.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   return new Response(
-    JSON.stringify(data),
-    { headers: { "Content-Type": "application/json" } },
-  )
-})
+    JSON.stringify({ inserted: insertData, fetched: fetchData }),
+    { headers: { "Content-Type": "application/json" } }
+  );
+});
 
 /* To invoke locally:
 
