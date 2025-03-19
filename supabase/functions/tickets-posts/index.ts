@@ -59,6 +59,59 @@ serve(async (req) => {
     return new Response(JSON.stringify({ fetched: fetchData }), {
       headers: { "Content-Type": "application/json" },
     });
+  } else if (method === "PUT") {
+    const { id, column_name, column_tasks } = await req.json();
+
+    if (!id || !column_name || !column_tasks) {
+      return new Response(
+        JSON.stringify({
+          error: "ID, 'column_name', and 'column_tasks' are required.",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from("Name")
+      .update({ column_name, column_tasks })
+      .eq("id", id)
+      .select();
+
+    if (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ updated: data }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  } else if (method === "DELETE") {
+    const { id } = await req.json();
+
+    if (!id) {
+      return new Response(
+        JSON.stringify({ error: "ID is required to delete." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const { error } = await supabase.from("Name").delete().eq("id", id);
+
+    if (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(
+      JSON.stringify({ success: true, message: "Record deleted!" }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 
   return new Response(JSON.stringify({ error: "Method Not Allowed" }), {
