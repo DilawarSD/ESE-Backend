@@ -15,12 +15,13 @@ serve(async (req) => {
   if (method === "POST") {
     const body = await req.json();
 
-    const { column_name, column_tasks } = body;
+    const { column_name, column_tasks, status } = body;
 
-    if (!column_name || !column_tasks) {
+    if (!column_name || !column_tasks || !status) {
       return new Response(
         JSON.stringify({
-          error: "Both 'column_name' and 'column_tasks' are required.",
+          error:
+            "Both 'column_name', 'column_tasks', and 'status' are required.",
         }),
         {
           status: 400,
@@ -31,7 +32,7 @@ serve(async (req) => {
 
     const { data: insertData, error: insertError } = await supabase
       .from("Name")
-      .insert([{ column_name, column_tasks }])
+      .insert([{ column_name, column_tasks, status }])
       .select();
 
     if (insertError) {
@@ -60,12 +61,13 @@ serve(async (req) => {
       headers: { "Content-Type": "application/json" },
     });
   } else if (method === "PUT") {
-    const { id, column_name, column_tasks } = await req.json();
+    const { id, column_name, column_tasks, status } = await req.json();
 
-    if (!id || !column_name || !column_tasks) {
+    if (!id || !column_name || !column_tasks || !status) {
       return new Response(
         JSON.stringify({
-          error: "ID, 'column_name', and 'column_tasks' are required.",
+          error:
+            "ID, 'column_name', 'column_tasks', and 'status' are required.",
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
@@ -73,7 +75,7 @@ serve(async (req) => {
 
     const { data, error } = await supabase
       .from("Name")
-      .update({ column_name, column_tasks })
+      .update({ column_name, column_tasks, status })
       .eq("id", id)
       .select();
 
