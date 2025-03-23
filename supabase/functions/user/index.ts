@@ -64,6 +64,59 @@ serve(async (req) => {
     return new Response(JSON.stringify({ fetched: fetchData }), {
       headers: { "Content-Type": "application/json" },
     });
+  } else if (method === "PUT") {
+    const { id, first_name, last_name } = await req.json();
+
+    if (!id || !first_name || !last_name) {
+      return new Response(
+        JSON.stringify({
+          error: "ID, 'first_name', and 'last_name' are required.",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from("User")
+      .update({ first_name, last_name })
+      .eq("id", id)
+      .select();
+
+    if (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ updated: data }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  } else if (method === "DELETE") {
+    const { id } = await req.json();
+
+    if (!id) {
+      return new Response(
+        JSON.stringify({ error: "ID is required to delete." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const { error } = await supabase.from("User").delete().eq("id", id);
+
+    if (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(
+      JSON.stringify({ success: true, message: "Record deleted!" }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 
   return new Response(JSON.stringify({ error: "Method Not Allowed" }), {
@@ -71,15 +124,3 @@ serve(async (req) => {
     headers: { "Content-Type": "application/json" },
   });
 });
-
-/* To invoke locally:
-
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
-
-  curl -i --location --request POST 'http://127.0.0.1:0/functions/v1/user' \
-    --header 'Authorization: Bearer ' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
-
-*/
