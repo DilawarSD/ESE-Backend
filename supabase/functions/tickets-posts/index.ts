@@ -12,27 +12,24 @@ const supabase = createClient(
 serve(async (req) => {
   const { method } = req;
 
+  // POST method for inserting data into the Name table (with email)
   if (method === "POST") {
     const body = await req.json();
+    const { column_name, column_tasks, status, email } = body;
 
-    const { column_name, column_tasks, status } = body;
-
-    if (!column_name || !column_tasks || !status) {
+    if (!column_name || !column_tasks || !status || !email) {
       return new Response(
         JSON.stringify({
           error:
-            "Both 'column_name', 'column_tasks', and 'status' are required.",
+            "Both 'column_name', 'column_tasks', 'status', and 'email' are required.",
         }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
     const { data: insertData, error: insertError } = await supabase
       .from("Name")
-      .insert([{ column_name, column_tasks, status }])
+      .insert([{ column_name, column_tasks, status, email }])
       .select();
 
     if (insertError) {
@@ -45,7 +42,10 @@ serve(async (req) => {
     return new Response(JSON.stringify({ inserted: insertData }), {
       headers: { "Content-Type": "application/json" },
     });
-  } else if (method === "GET") {
+  }
+
+  // GET method for fetching data from the Name table (including email)
+  else if (method === "GET") {
     const { data: fetchData, error: fetchError } = await supabase
       .from("Name")
       .select("*");
@@ -60,14 +60,17 @@ serve(async (req) => {
     return new Response(JSON.stringify({ fetched: fetchData }), {
       headers: { "Content-Type": "application/json" },
     });
-  } else if (method === "PUT") {
-    const { id, column_name, column_tasks, status } = await req.json();
+  }
 
-    if (!id || !column_name || !column_tasks || !status) {
+  // PUT method for updating a record in the Name table (with email)
+  else if (method === "PUT") {
+    const { id, column_name, column_tasks, status, email } = await req.json();
+
+    if (!id || !column_name || !column_tasks || !status || !email) {
       return new Response(
         JSON.stringify({
           error:
-            "ID, 'column_name', 'column_tasks', and 'status' are required.",
+            "ID, 'column_name', 'column_tasks', 'status', and 'email' are required.",
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
@@ -75,8 +78,8 @@ serve(async (req) => {
 
     const { data, error } = await supabase
       .from("Name")
-      .update({ column_name, column_tasks, status })
-      .eq("id", id)
+      .update({ column_name, column_tasks, status, email })
+      .eq("id", id) // Match by the ID
       .select();
 
     if (error) {
@@ -89,7 +92,10 @@ serve(async (req) => {
     return new Response(JSON.stringify({ updated: data }), {
       headers: { "Content-Type": "application/json" },
     });
-  } else if (method === "DELETE") {
+  }
+
+  // DELETE method for deleting a record from the Name table (using id)
+  else if (method === "DELETE") {
     const { id } = await req.json();
 
     if (!id) {
