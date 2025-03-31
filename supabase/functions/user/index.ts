@@ -128,7 +128,7 @@ serve(async (req) => {
     const { data, error } = await supabase
       .from("Name")
       .update({ column_name, column_tasks, status, email })
-      .eq("id", id) // Match by the ID
+      .eq("id", id) // Matching the ID
       .select();
 
     if (error) {
@@ -159,7 +159,7 @@ serve(async (req) => {
     const { data, error } = await supabase
       .from("User")
       .update({ first_name, last_name, email })
-      .eq("id", id) // Match by the ID
+      .eq("id", id) // Matching the ID
       .select();
 
     if (error) {
