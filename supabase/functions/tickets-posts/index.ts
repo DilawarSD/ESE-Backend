@@ -17,11 +17,11 @@ serve(async (req) => {
     const body = await req.json();
     const { column_name, column_tasks, status, email } = body;
 
-    if (!column_name || !column_tasks || !status || !email) {
+    // Required fields are filled out
+    if (!column_name || !status) {
       return new Response(
         JSON.stringify({
-          error:
-            "Both 'column_name', 'column_tasks', 'status', and 'email' are required.",
+          error: "Both 'column_name'and 'status' are required.",
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
@@ -66,11 +66,11 @@ serve(async (req) => {
   else if (method === "PUT") {
     const { id, column_name, column_tasks, status, email } = await req.json();
 
-    if (!id || !column_name || !column_tasks || !status || !email) {
+    // Required fields are filled out
+    if (!id || !column_name || !status) {
       return new Response(
         JSON.stringify({
-          error:
-            "ID, 'column_name', 'column_tasks', 'status', and 'email' are required.",
+          error: "ID, 'column_name'and 'status' are required.",
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
