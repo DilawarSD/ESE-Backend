@@ -12,7 +12,7 @@ const supabase = createClient(
 serve(async (req) => {
   const { method } = req;
 
-  // POST method for inserting data into the Name table (with email)
+  // POST method for inserting data into the Name table
   if (method === "POST") {
     const body = await req.json();
     const { column_name, column_tasks, status, email } = body;
@@ -44,7 +44,7 @@ serve(async (req) => {
     });
   }
 
-  // GET method for fetching data from the Name table (including email)
+  // GET method for fetching data from the Name table
   else if (method === "GET") {
     const { data: fetchData, error: fetchError } = await supabase
       .from("Name")
@@ -62,7 +62,7 @@ serve(async (req) => {
     });
   }
 
-  // PUT method for updating a record in the Name table (with email)
+  // PUT method for updating a record in the Name table
   else if (method === "PUT") {
     const { id, column_name, column_tasks, status, email } = await req.json();
 
@@ -79,7 +79,7 @@ serve(async (req) => {
     const { data, error } = await supabase
       .from("Name")
       .update({ column_name, column_tasks, status, email })
-      .eq("id", id) // Match by the ID
+      .eq("id", id)
       .select();
 
     if (error) {
@@ -94,7 +94,7 @@ serve(async (req) => {
     });
   }
 
-  // DELETE method for deleting a record from the Name table (using id)
+  // DELETE method for deleting a record from the Name table
   else if (method === "DELETE") {
     const { id } = await req.json();
 
