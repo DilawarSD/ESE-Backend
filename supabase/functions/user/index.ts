@@ -12,7 +12,7 @@ const supabase = createClient(
 serve(async (req) => {
   const { method } = req;
 
-  // POST method for inserting data into the Name table (with email)
+  // POST method for inserting data into the Name table
   if (method === "POST" && req.url.includes("name")) {
     const body = await req.json();
     const { column_name, column_tasks, status, email } = body;
@@ -44,7 +44,7 @@ serve(async (req) => {
     });
   }
 
-  // POST method for inserting data into the User table (with email)
+  // POST method for inserting data into the User table
   else if (method === "POST" && req.url.includes("user")) {
     const body = await req.json();
     const { first_name, last_name, email } = body;
@@ -75,7 +75,7 @@ serve(async (req) => {
     });
   }
 
-  // GET method for fetching data from the Name table (including email)
+  // GET method for fetching data from the Name table
   else if (method === "GET" && req.url.includes("name")) {
     const { data: fetchData, error: fetchError } = await supabase
       .from("Name")
@@ -93,7 +93,7 @@ serve(async (req) => {
     });
   }
 
-  // GET method for fetching data from the User table (including email)
+  // GET method for fetching data from the User table
   else if (method === "GET" && req.url.includes("user")) {
     const { data: fetchData, error: fetchError } = await supabase
       .from("User")
@@ -111,7 +111,7 @@ serve(async (req) => {
     });
   }
 
-  // PUT method for updating a record in the Name table (with email)
+  // PUT method for updating a record in the Name table
   else if (method === "PUT" && req.url.includes("name")) {
     const { id, column_name, column_tasks, status, email } = await req.json();
 
@@ -128,7 +128,7 @@ serve(async (req) => {
     const { data, error } = await supabase
       .from("Name")
       .update({ column_name, column_tasks, status, email })
-      .eq("id", id) // Matching the ID
+      .eq("id", id)
       .select();
 
     if (error) {
@@ -143,7 +143,7 @@ serve(async (req) => {
     });
   }
 
-  // PUT method for updating a record in the User table (with email)
+  // PUT method for updating a record in the User table
   else if (method === "PUT" && req.url.includes("user")) {
     const { id, first_name, last_name, email } = await req.json();
 
@@ -159,7 +159,7 @@ serve(async (req) => {
     const { data, error } = await supabase
       .from("User")
       .update({ first_name, last_name, email })
-      .eq("id", id) // Matching the ID
+      .eq("id", id)
       .select();
 
     if (error) {
